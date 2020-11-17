@@ -9,4 +9,4 @@
 * Removed non english songs
 * Filter relevant features: 'track_id', 'track_name', 'track_artist', 'lyrics', 'track_album_name', 'playlist_genre'
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/oriolgarrobe/Lyrics-classification-with-Transformers/project.pynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/oriolgarrobe/Lyrics-classification-with-Transformers/project.ipynb)
