@@ -7,9 +7,12 @@ def preprocess(df):
     df = df.loc[df['language'] == 'en']
     
     # Filter relevant columns
-    df = df[['track_id', 'lyrics', 'playlist_genre']]
+    df = df[['lyrics', 'playlist_genre']]
     
     # Change column names for model
     df = df.rename(columns={'lyrics': 'text', 'playlist_genre': 'label'})
+    
+    # Lables str->numeric
+    df['label'] = pd.factorize(df['label'])[0]
     
     return(df)
