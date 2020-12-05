@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
 
-def preprocess_lyrics(data):
+def preprocess_lyrics(df):
     """Function that preprocesses a dataframe before feeding it to text classification libraries"""
     
     # Filter English songs
