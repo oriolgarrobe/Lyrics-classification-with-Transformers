@@ -41,19 +41,26 @@ def preprocess(data):
     # Change column names for model
     data = data.rename(columns={'category': 'label'})
     
-    # Get only 6 larger classes
-    largest = data.groupby('label').count().nlargest(6,'text')
-    classes = [i[0] for i in largest.itertuples()] # value of largest classes
-    data = data[data['label'].isin(classes)]
-    
-    # Create dictionary to map classes to integers
-    genres = {key:classes.index(key) for key in classes}    
+    # Get only 6 largest classes / Create dictionary to map classes to integers
+    data, genres = largest_classes(data, 6)   
 
     # Lables str->numeric
     data['label'] = pd.factorize(data['label'], sort=True)[0]
     
     return data, genres
 
+def largest_classes(data, n_class):
+    """
+    Select only the n_class largest classes of a pandas dataframe.
+    """
+    largest = data.groupby('label').count().nlargest(n_class,'text')
+    classes = [i[0] for i in largest.itertuples()] # value of largest classes
+    data = data[data['label'].isin(classes)]
+    
+    # Create dictionary to map classes to integers
+    genres = {key:classes.index(key) for key in classes}  
+    
+    return data, genres
 
 def model_performance(model, data, n_obs, n_class):
     """
@@ -71,9 +78,7 @@ def model_performance(model, data, n_obs, n_class):
     - F1-score: Integer.
     """
     # Filter the n_class largest classes.
-    largest = data.groupby('label').count().nlargest(n_class,'text')
-    classes = [i[0] for i in largest.itertuples()] # value of largest classes
-    data = data[data['label'].isin(classes)]
+    data,_ = largest_classes(data, n_class)
     
     # Select n_obs from the data. Stratified by class.
     train_df, test_df = train_test_split(data, train_size= n_obs, test_size=2000)
@@ -84,10 +89,45 @@ def model_performance(model, data, n_obs, n_class):
     # Predict
     preds = model.predict(test_df['text'])   
     
-    # Compute Performance Measures
-    measures = classification_report(test_df['label'], preds, zero_division = 0, output_dict=True)
+    # Compute Performance Measures   
+    precision, recall, f1 = performance_measures(test_df['label'], preds)
+    
+    return precision, recall, f1
+
+
+from simpletransformers.classification import ClassificationModel, ClassificationArgs
+
+def transformer_performance(model, data, n_obs, n_class):
+    
+    # Filter the n_class largest classes.
+    data,_ = largest_classes(data, n_class)
+    
+    # Factorize classes for transformer class
+    data['label'] = pd.factorize(data['label'], sort=True)[0]
+    
+    # Select n_obs from the data. Stratified by class.
+    train_df, test_df = train_test_split(data, train_size= n_obs, test_size=2000)
+    
+    # Model train
+    model.train_model(train_df)
+    
+    # Model predict
+    test_l = list(test_df['text'])
+    preds,_ = model.predict(test_l)
+    
+    # Compute Performance Measures   
+    precision, recall, f1 = performance_measures(test_df['label'], preds)
+    
+    return precision, recall, f1
+
+
+
+def performance_measures(test_data, predictions):
+    
+    measures = classification_report(test_data, predictions, zero_division = 0, output_dict=True)
     precision = measures['macro avg']['precision']
     recall = measures['macro avg']['recall']
     f1 = measures['macro avg']['f1-score']
     
     return precision, recall, f1
+    
