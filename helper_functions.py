@@ -1,5 +1,6 @@
 # Libraries needed
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
@@ -95,7 +96,9 @@ def model_performance(model, data, n_obs, n_class):
     return precision, recall, f1
 
 
-from simpletransformers.classification import ClassificationModel, ClassificationArgs
+#from simpletransformers.classification import ClassificationModel, ClassificationArgs
+
+import matplotlib.pyplot as plt
 
 def transformer_performance(model, data, n_obs, n_class):
     
@@ -130,4 +133,56 @@ def performance_measures(test_data, predictions):
     f1 = measures['macro avg']['f1-score']
     
     return precision, recall, f1
+
+
+
+def plot_comp(f1_array, time_array, n_class):
+    """
+    Function that shows and stores a multiplot. 
+    The plot has 2 level.
+    - The upper level compares the f1-score of 3 models.
+    - The lower level compares the training time - in minutes - of such models.
+    Each level compares 8 different sample size.
+    
+    Inputs:
+    - f1_array: Numpy array with values of f1-score of each model. Shape = (3,8).
+    - time_array: Numpy array with values of training time of each model. Shape = (3,8)
+    
+    Outputs:
+    - matplotlib.pyplot.show(): Shows the plot.
+    - Stores the plot in a folder calles 'Plots' in .png format.
+    """
+    
+    title = 'Text Classification - ' + str(n_class) + ' Classes'
+
+    # Create plot
+    fig, (ax1, ax2) = plt.subplots(2, figsize=(15,5))
+    fig.suptitle(title)
+    
+    X = np.arange(8) #number of different sample sizes
+    
+    # F1-Score
+    ax1.bar(X-0.25 , f1_array[0], color = 'lightgreen', width = 0.25)
+    ax1.bar(X, f1_array[1], color = 'darkblue', width = 0.25)
+    ax1.bar(X +0.25, f1_array[2], color = 'yellow', width = 0.25)
+    ax1.set(ylabel='F1-score')
+    ax1.set_xticks([])
+    
+    # Training Time
+    ax2.bar(X-0.25 , time_array[0]/60, color = 'lightgreen', width = 0.25)
+    ax2.bar(X, time_array[1]/60, color = 'darkblue', width = 0.25)
+    ax2.bar(X +0.25, time_array[2]/60, color = 'yellow', width = 0.25)
+    ax2.legend(labels=['LR', 'SVM', 'BERT'], loc=2)
+    ax2.set(ylabel='Time (min)')
+    
+    # Xticks
+    sample_size = ['1000', '2000', '4000', '6000', '10000', '15000', '20000', '40000']
+    plt.xticks(ticks=np.arange(8),labels=sample_size, ha='center')
+    plt.xlabel("Sample Size")
+    
+    # Save plot
+    root = 'Plots/'+str(n_class)+'_Classes.png'
+
+    plt.savefig(root)
+    plt.show()
     
