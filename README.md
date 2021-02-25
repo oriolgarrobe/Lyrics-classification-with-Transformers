@@ -1,5 +1,7 @@
 # Comparison of Transformer and non-Transformer Models for a Text Classification Task
 
+Click here to access the full report [:page_with_curl:](https://github.com/oriolgarrobe/Text-classification/blob/main/TM_Project_Garrobe.pdf)
+
 **Abstract**
 
 The Natural Language Processing (NLP) field is changing with the introduction of the Transformer in 2017. The Transformer has replaced many Machine Learning (ML)
